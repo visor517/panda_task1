@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.wrapper {
+  padding: 1em;
+  margin: 1em;
+  background-color:cadetblue;
+}
+
+.react_table td { padding: 0.5em 1em}
+.react_table tr { background-color: #eee; }
+.react_table tr:nth-child(2n) { background-color: #ccc; }
+.react_table thead tr { background-color: #333; color: #eee}
