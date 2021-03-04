@@ -25,7 +25,7 @@ code {
 .reactTable td { padding: 0.5em 1em}
 .reactTable tr { background-color: #eee; }
 .reactTable tr:nth-child(2n) { background-color: #ccc; }
-.reactTable thead tr { background-color: #333; color: #eee}
+.reactTable thead td { background-color: #333; color: #eee; cursor: pointer;}
 
 .reactTable_pagination {
   margin: 0;
@@ -40,3 +40,6 @@ code {
   color:#eee;
   cursor: pointer;
 }
+
+.ascending:after {content: " \2193";}
+.descending:after {content: " \2191";}

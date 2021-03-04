@@ -1,16 +1,40 @@
+import {useState} from 'react'
 import TodoRow from './Todo/TodoRow'
 import TodoColName from './Todo/TodoColName'
 import TodoPagination from './Todo/TodoPagination'
+
 let jsonTable = require('./data.json')
 let rows = jsonTable.content
 
 function App() {
-  const rowsLimit = 4
-  let startRow = 0
-  let rowsForView = jsonTable.content.slice(startRow, startRow + rowsLimit)
 
-  function changePage(page) {
-    startRow = 0 + (page - 1)*rowsLimit
+  const ROWSLIMIT = 4
+
+  const [rowsForView, setRowsForView] = useState(rows.slice(0, ROWSLIMIT))
+
+  const [sorting, setSorting] = useState(["none", true])
+
+  function choseView(page) {
+    let startRow = 0 + (page - 1)*ROWSLIMIT
+    setRowsForView(
+      rows.slice(startRow, startRow + ROWSLIMIT)
+    )
+  }
+
+  function makeSort(keyName) {
+    if ((sorting[0] == keyName) && sorting[1]) {
+      setSorting([keyName, false])
+      setRowsForView(
+        rows.sort((a, b) => (a[keyName] > b[keyName]) ? -1 : 1).slice(0, ROWSLIMIT)
+      )
+    }
+    else {
+      setSorting([keyName, true])
+      setRowsForView(
+        rows.sort((a, b) => (a[keyName] < b[keyName]) ? -1 : 1).slice(0, ROWSLIMIT)
+      )
+    }
+    console.log(rowsForView)
   }
 
   return (
@@ -19,7 +43,7 @@ function App() {
       <table className="reactTable">
         <thead>
           <tr>
-            { Object.keys(rows[0]).map((keyName, index) => {return <TodoColName name={keyName} key={index} />} )}
+            { Object.keys(rows[0]).map((keyName, index) => {return <TodoColName keyName={keyName} key={index} onClick={makeSort} sorting={sorting}/>} )}
           </tr>
         </thead>
         <tbody>
@@ -28,7 +52,7 @@ function App() {
           })}
         </tbody>
       </table>
-      <TodoPagination numRows={rows.length} onClick={changePage} />
+      <TodoPagination numRows={rows.length} onClick={choseView} />
     </div>
   )
 }
