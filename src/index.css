@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -18,7 +22,21 @@ code {
   background-color:cadetblue;
 }
 
-.react_table td { padding: 0.5em 1em}
-.react_table tr { background-color: #eee; }
-.react_table tr:nth-child(2n) { background-color: #ccc; }
-.react_table thead tr { background-color: #333; color: #eee}
+.reactTable td { padding: 0.5em 1em}
+.reactTable tr { background-color: #eee; }
+.reactTable tr:nth-child(2n) { background-color: #ccc; }
+.reactTable thead tr { background-color: #333; color: #eee}
+
+.reactTable_pagination {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  list-style: none;
+}
+.reactTable_pagination li {
+  padding: 0.5em 1em;
+  margin-left: 2px;
+  background-color: #333;
+  color:#eee;
+  cursor: pointer;
+}

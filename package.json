@@ -2,6 +2,7 @@
   "name": "panda",
   "version": "0.1.0",
   "private": true,
+  "main": "./App.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
@@ -34,5 +35,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.5.0"
   }
 }
