@@ -26,7 +26,11 @@ function App() {
       }
       return false 
     })
-    sortSet[0] ? doSorting(sortSet[0], sortSet[1], rowsFiltered) : rowsPrepared = rowsFiltered
+    if (sortSet[0]) doSorting(sortSet[0], sortSet[1], rowsFiltered)
+    else {
+      rowsPrepared = rowsFiltered
+      changePage()
+    }
   }
 
   function selectSortSet(keyName) {
@@ -60,7 +64,7 @@ function App() {
           { page.map((item,row_i) => <TodoRow item={item} key={row_i} />)}
         </tbody>
       </table>
-      <TodoPagination numRows={rows.length} rowsLimit={ROWSLIMIT} onClick={changePage} />
+      <TodoPagination numRows={rowsPrepared.length} rowsLimit={ROWSLIMIT} onClick={changePage} />
     </div>
   )
 }
