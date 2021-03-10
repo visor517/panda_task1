@@ -1,10 +1,10 @@
-export default function TodoPagination({ numRows, onClick}) {
+export default function TodoPagination({ numRows, rowsLimit, onClick}) {
 
     let pages = [], i = 0
     do {
         i++
         pages.push(i)
-    } while (i*4 < numRows)
+    } while (i*rowsLimit < numRows)
 
     return (
         <ul className="reactTable_pagination">

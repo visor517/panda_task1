@@ -1,9 +1,9 @@
+import React from 'react'
+
 export default function TodoRow({ item }) {
     return (
         <tr>
-            <td>{ item.id }</td>
-            <td>{ item.name }</td>
-            <td>{ item.age }</td>
+            {Object.values(item).map((value,val_i) => <td key={val_i}>{value}</td>)}
         </tr>
     )
 }
