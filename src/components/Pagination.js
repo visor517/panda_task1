@@ -1,4 +1,4 @@
-export default function TodoPagination({ numRows, rowsLimit, onClick}) {
+export default function Pagination({ numRows, rowsLimit, onClick}) {
 
     let pages = [], i = 0
     do {

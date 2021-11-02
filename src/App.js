@@ -1,72 +1,70 @@
-import React, {useState} from 'react'
-import TodoColName from './Todo/TodoColName'
-import TodoPagination from './Todo/TodoPagination'
-import TodoFilter from './Todo/TodoFilter'
-import TodoRow from './Todo/TodoRow'
-
-let jsonTable = require('./data.json')
-let rows = jsonTable.content
-let rowsPrepared = rows
-
-const ROWSLIMIT = 50
+import React, {useState, useEffect} from 'react'
+import ColName from './components/ColName'
+import Pagination from './components/Pagination'
+import Filter from './components/Filter'
+import Row from './components/Row'
 
 function App() {
   
-  const [sortSet, setSortSet] = useState([undefined, true])  // в первом элементе колонка сортировки, во втором направление сортировки
-  const [page, setPage] = useState(rows.slice(0,50))
+  const ROWSLIMIT = 50
+  
+  let tableName = 'Таблица'
+  const [sortSettings, setSortSettings] = useState({
+    sortBy: undefined,
+    isIncrease: true 
+  })
+  const [rows, setRows] = useState([])
+  const [pageNum, setPageNum] = useState(1)
+  const [filterText, setFilterText] = useState('')
   
   function changePage(pageNum = 1) {
-    setPage(rowsPrepared.slice((pageNum - 1) * ROWSLIMIT, pageNum * ROWSLIMIT))
+    setPageNum(pageNum)
   }
 
-  function doPreparation(template = "") {
-    let rowsFiltered = rows.filter(item => {
-      for (let key in item) {
-        if (String(item[key]).toLowerCase().indexOf(template) !== -1) return true
-      }
-      return false 
-    })
-    if (sortSet[0]) doSorting(sortSet[0], sortSet[1], rowsFiltered)
-    else {
-      rowsPrepared = rowsFiltered
-      changePage()
+  function changeSort(keyName) {
+    if (sortSettings.sortBy === keyName) {
+      setSortSettings(oldSort => ({ ...oldSort, 'isIncrease': !oldSort.isIncrease}))
     }
+    else setSortSettings({sortBy: keyName, isIncrease: true})
   }
 
-  function selectSortSet(keyName) {
-    if ((sortSet[0] === keyName) && sortSet[1]) {
-      setSortSet([keyName, false])
-      doSorting(keyName, false)
-    }
-    else {
-      setSortSet([keyName, true])
-      doSorting(keyName, true)
-    }
+  function getData() {
+    // по идее получаем данные с api
+    const JSON_DATA = require('./data.json')
+    return {
+      tableName: JSON_DATA.tableName,
+      rows: JSON_DATA.content
+    }    
   }
 
-  function doSorting(keyName,wayOfSort, rowsForSort = rowsPrepared) {
-    rowsPrepared = wayOfSort ? rowsForSort.sort((a, b) => (a[keyName] < b[keyName]) ? -1 : 1)
-                             : rowsForSort.sort((a, b) => (a[keyName] > b[keyName]) ? -1 : 1)
-    changePage()
-  }
+  useEffect(() => {
+    const result = getData()
+    tableName = result.tableName
+    setRows(result.rows)
+  }, [])
 
   return (
     <div className='wrapper'>
-      <h1>{jsonTable.tableName}</h1>
-      <TodoFilter onChange={doPreparation}/>
+      <h1>{tableName}</h1>
+      <Filter onChange={setFilterText}/>
       <table className="reactTable">
         <thead>
           <tr>
-            { Object.keys(rows[0]).map((keyName, col_i) => {return <TodoColName keyName={keyName} key={col_i} onClick={selectSortSet} sorting={sortSet}/>} )}
+            { rows[0] && Object.keys(rows[0]).map(keyName => {
+              let arrow = keyName == sortSettings.sortBy ? sortSettings.isIncrease : undefined
+              return <ColName keyName={keyName} key={keyName} onClick={changeSort} arrow={arrow} />
+            })}
           </tr>
         </thead>  
         <tbody>
-          { page.map((item,row_i) => <TodoRow item={item} key={row_i} />)}
+          { rows.filter(row => row.name.indexOf(filterText) != -1)
+                .filter((row, index) => index >= (pageNum - 1) * ROWSLIMIT && index < pageNum * ROWSLIMIT)
+                .map(row => <Row item={row} key={row.id} />)}
         </tbody>
       </table>
-      <TodoPagination numRows={rowsPrepared.length} rowsLimit={ROWSLIMIT} onClick={changePage} />
+      <Pagination numRows={rows.length} rowsLimit={ROWSLIMIT} onClick={changePage} />
     </div>
   )
 }
 
-export default App;
+export default App
