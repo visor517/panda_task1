@@ -36,6 +36,9 @@ function App() {
     )
   }, [rows, filterText, sortSettings])
 
+  // переход на первую страницу при изменении лимита вывода строк на страницу
+  useEffect(() => setPageNum(1), [rowsLimit, preparedRows])
+
   function changeSort(keyName) {
     if (sortSettings.sortBy === keyName) {
       setSortSettings(oldSort => ({ ...oldSort, 'isIncrease': !oldSort.isIncrease}))
