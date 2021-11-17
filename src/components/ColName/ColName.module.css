@@ -1,0 +1,11 @@
+.ascending:after {
+    content: '\1F817'
+}
+
+.descending:after {
+    content: '\1F815'
+}
+
+.pointer {
+    cursor: pointer;
+}
