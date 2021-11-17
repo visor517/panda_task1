@@ -9,7 +9,7 @@ export default function Limiter({ limit, setLimit }) {
     return (
         <div>
             10 - 100 :
-            <input type="number" min="10" max="100" defaultValue={limit} onChange={e => handler(e.target.value)} />
+            <input type="number" min="10" max="100" className="ms-2" defaultValue={limit} onChange={e => handler(e.target.value)} />
         </div>
     )
 }

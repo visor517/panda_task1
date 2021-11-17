@@ -93,7 +93,7 @@ function App() {
             </table> :
             <p>Загружается...</p>
           }
-          <Pagination numRows={preparedRows.length} rowsLimit={rowsLimit} onClick={setPageNum} />
+          <Pagination numRows={preparedRows.length} rowsLimit={rowsLimit} activePage={pageNum} setPageNum={setPageNum} />
         </div>
       </div>
     </div>
