@@ -1,72 +1,106 @@
-import React, {useState} from 'react'
-import TodoColName from './Todo/TodoColName'
-import TodoPagination from './Todo/TodoPagination'
-import TodoFilter from './Todo/TodoFilter'
-import TodoRow from './Todo/TodoRow'
-
-let jsonTable = require('./data.json')
-let rows = jsonTable.content
-let rowsPrepared = rows
-
-const ROWSLIMIT = 50
+import React, {useState, useEffect} from 'react'
+import ColName from './components/ColName/ColName'
+import Pagination from './components/Pagination/Pagination'
+import Filter from './components/Filter/Filter'
+import Limiter from './components/Limiter/Limiter'
+import Row from './components/Row/Row'
 
 function App() {
   
-  const [sortSet, setSortSet] = useState([undefined, true])  // в первом элементе колонка сортировки, во втором направление сортировки
-  const [page, setPage] = useState(rows.slice(0,50))
+  const [tableName, setTableName] = useState('Таблица')
+  const [rows, setRows] = useState([])
   
-  function changePage(pageNum = 1) {
-    setPage(rowsPrepared.slice((pageNum - 1) * ROWSLIMIT, pageNum * ROWSLIMIT))
+  // отфильтрованные, отсортированные
+  const [preparedRows, setPreparedRows] = useState([])
+  const [pageNum, setPageNum] = useState(1)
+  const [rowsLimit, setRowsLimit] = useState(50)
+  const [filterText, setFilterText] = useState('')
+  const [sortSettings, setSortSettings] = useState({
+    sortBy: undefined,
+    isIncrease: true 
+  })
+
+  useEffect(() => {
+    setPreparedRows(
+      rows.filter(row =>     // ищем вхождение фильтра в одно из полей
+        Object.values(row).filter(elem => elem.toString().toLowerCase().indexOf(filterText) !== -1).length > 0
+      )
+      .sort((a, b) => {
+        if (sortSettings.isIncrease) {
+          return a[sortSettings.sortBy] < b[sortSettings.sortBy] ? -1 : 1
+        }
+        else {
+          return a[sortSettings.sortBy] > b[sortSettings.sortBy] ? -1 : 1
+        }
+      })
+    )
+  }, [rows, filterText, sortSettings])
+
+  // переход на первую страницу при изменении лимита вывода строк на страницу
+  useEffect(() => setPageNum(1), [rowsLimit, preparedRows])
+
+  function changeSort(keyName) {
+    if (sortSettings.sortBy === keyName) {
+      setSortSettings(oldSort => ({ ...oldSort, 'isIncrease': !oldSort.isIncrease}))
+    }
+    else setSortSettings({sortBy: keyName, isIncrease: true})
   }
 
-  function doPreparation(template = "") {
-    let rowsFiltered = rows.filter(item => {
-      for (let key in item) {
-        if (String(item[key]).toLowerCase().indexOf(template) !== -1) return true
-      }
-      return false 
-    })
-    if (sortSet[0]) doSorting(sortSet[0], sortSet[1], rowsFiltered)
-    else {
-      rowsPrepared = rowsFiltered
-      changePage()
-    }
+  function getData() {
+    // по идее получаем данные с api
+    const JSON_DATA = require('./data.json')
+    return {
+      tableName: JSON_DATA.tableName,
+      content: JSON_DATA.content
+    }    
   }
 
-  function selectSortSet(keyName) {
-    if ((sortSet[0] === keyName) && sortSet[1]) {
-      setSortSet([keyName, false])
-      doSorting(keyName, false)
+  useEffect(() => {
+    try {
+      const result = getData()
+      setTableName(result.tableName)
+      setRows(result.content)
     }
-    else {
-      setSortSet([keyName, true])
-      doSorting(keyName, true)
+    catch {
+      console.log('Ошибка получения данных')
     }
-  }
 
-  function doSorting(keyName,wayOfSort, rowsForSort = rowsPrepared) {
-    rowsPrepared = wayOfSort ? rowsForSort.sort((a, b) => (a[keyName] < b[keyName]) ? -1 : 1)
-                             : rowsForSort.sort((a, b) => (a[keyName] > b[keyName]) ? -1 : 1)
-    changePage()
-  }
+  }, [])
 
   return (
-    <div className='wrapper'>
-      <h1>{jsonTable.tableName}</h1>
-      <TodoFilter onChange={doPreparation}/>
-      <table className="reactTable">
-        <thead>
-          <tr>
-            { Object.keys(rows[0]).map((keyName, col_i) => {return <TodoColName keyName={keyName} key={col_i} onClick={selectSortSet} sorting={sortSet}/>} )}
-          </tr>
-        </thead>  
-        <tbody>
-          { page.map((item,row_i) => <TodoRow item={item} key={row_i} />)}
-        </tbody>
-      </table>
-      <TodoPagination numRows={rowsPrepared.length} rowsLimit={ROWSLIMIT} onClick={changePage} />
+    <div className='container bg-light shadow bg-body rounded'>
+      <div className='row'>
+        <div className='col p-3'>
+          <h1>{tableName}</h1>
+          <div className="d-flex justify-content-between">
+            <Filter onChange={setFilterText}/>
+            <Limiter limit={rowsLimit} setLimit={setRowsLimit} />
+          </div>
+          {rows.length > 0 ?
+            <table className="table">
+              <thead>
+                <tr>
+                  { Object.keys(rows[0]).map(keyName => {
+                    let arrow = keyName === sortSettings.sortBy ? sortSettings.isIncrease : undefined
+                    return <ColName keyName={keyName} key={keyName} onClick={changeSort} arrow={arrow} />
+                  })}
+                </tr>
+              </thead>  
+              <tbody>
+                { preparedRows.length > 0 ? 
+                      preparedRows.filter((row, index) => index >= (pageNum - 1) * rowsLimit && index < pageNum * rowsLimit)
+                      .map(row => <Row item={row} key={row.id} />) :
+                  <tr><td colSpan={rows[0].length}>Нет данных</td></tr>
+                }
+              </tbody>
+            </table> :
+            <p>Загружается...</p>
+          }
+          <Pagination numRows={preparedRows.length} rowsLimit={rowsLimit} activePage={pageNum} setPageNum={setPageNum} />
+        </div>
+      </div>
     </div>
   )
 }
 
-export default App;
+export default App
