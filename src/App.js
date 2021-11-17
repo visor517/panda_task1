@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+// import axios from 'axios'
 import ColName from './components/ColName/ColName'
 import Pagination from './components/Pagination/Pagination'
 import Filter from './components/Filter/Filter'
@@ -20,6 +21,32 @@ function App() {
     isIncrease: true 
   })
 
+  function changeSort(keyName) {
+    if (sortSettings.sortBy === keyName) {
+      setSortSettings(oldSort => ({ ...oldSort, 'isIncrease': !oldSort.isIncrease}))
+    }
+    else setSortSettings({sortBy: keyName, isIncrease: true})
+  }
+
+  useEffect(() => {
+    const JSON_DATA = require('./data.json')
+    
+    setTableName(JSON_DATA.tableName)
+    setRows(JSON_DATA.content)
+  },[])
+
+  // useEffect(() => {
+  //   axios('api/data')
+  //   .then(
+  //     res => {
+  //       setRows(res.data.content)
+  //       setTableName(res.data.tableName)
+  //     },
+  //     err => console.log('Ошибка получения данных')
+  //   )
+  // }, [])
+
+  // обработка данных при изменении фильтра или сортировки
   useEffect(() => {
     setPreparedRows(
       rows.filter(row =>     // ищем вхождение фильтра в одно из полей
@@ -38,34 +65,6 @@ function App() {
 
   // переход на первую страницу при изменении лимита вывода строк на страницу
   useEffect(() => setPageNum(1), [rowsLimit, preparedRows])
-
-  function changeSort(keyName) {
-    if (sortSettings.sortBy === keyName) {
-      setSortSettings(oldSort => ({ ...oldSort, 'isIncrease': !oldSort.isIncrease}))
-    }
-    else setSortSettings({sortBy: keyName, isIncrease: true})
-  }
-
-  function getData() {
-    // по идее получаем данные с api
-    const JSON_DATA = require('./data.json')
-    return {
-      tableName: JSON_DATA.tableName,
-      content: JSON_DATA.content
-    }    
-  }
-
-  useEffect(() => {
-    try {
-      const result = getData()
-      setTableName(result.tableName)
-      setRows(result.content)
-    }
-    catch {
-      console.log('Ошибка получения данных')
-    }
-
-  }, [])
 
   return (
     <div className='container bg-light shadow bg-body rounded'>
