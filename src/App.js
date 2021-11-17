@@ -89,7 +89,7 @@ function App() {
                 { preparedRows.length > 0 ? 
                       preparedRows.filter((row, index) => index >= (pageNum - 1) * rowsLimit && index < pageNum * rowsLimit)
                       .map(row => <Row item={row} key={row.id} />) :
-                  <tr><td colSpan={rows[0].length}>Нет данных</td></tr>
+                  <tr><td colSpan={Object.keys(rows[0]).length}>Нет данных</td></tr>
                 }
               </tbody>
             </table> :
